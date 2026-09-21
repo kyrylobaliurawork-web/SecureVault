@@ -1,20 +1,29 @@
+import { Link } from "react-router-dom";
 import "./Navbar.css";
 
 function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-logo">
-        <span>SecureVault</span>
+        <Link to="/">
+          <span>SecureVault</span>
+        </Link>
       </div>
 
       <div className="navbar-actions">
-        <button className="navbar-button navbar-button-login">
+        <Link
+          to="/login"
+          className="navbar-button navbar-button-login"
+        >
           Login
-        </button>
+        </Link>
 
-        <button className="navbar-button navbar-button-register">
+        <Link
+          to="/register"
+          className="navbar-button navbar-button-register"
+        >
           Register
-        </button>
+        </Link>
       </div>
     </nav>
   );

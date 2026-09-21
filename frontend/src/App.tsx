@@ -1,12 +1,8 @@
-// import Auth from "./pages/Auth/Auth";
-import Profile from "./pages/Profile/Profile";
-// import Home from "./pages/Home/Home";
-
+import { RouterProvider } from "react-router-dom";
+import router from "./router/router";
 
 function App() {
-  // return <Home />;
-  // return <Auth/>;
-  return <Profile/>;
+  return <RouterProvider router={router} />;
 }
 
 export default App;
