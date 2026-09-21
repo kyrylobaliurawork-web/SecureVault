@@ -1,86 +1,112 @@
 import "./AuthForm.css";
 
 interface AuthFormProps {
-  isLogin: boolean;
+  mode: "login" | "register";
+  onSubmit: () => void;
   onSwitch: () => void;
 }
 
-function AuthForm({ isLogin, onSwitch }: AuthFormProps) {
+function AuthForm({
+  mode,
+  onSubmit,
+  onSwitch,
+}: AuthFormProps) {
+  const isLogin = mode === "login";
+
   return (
-    <div className="auth-card">
-      <div className="auth-header">
-        <div className="auth-logo">🔐</div>
+    <main className="auth-page">
+      <div className="auth-card">
+        <div className="auth-header">
+          <div className="auth-logo">🔐</div>
 
-        <h1>{isLogin ? "Welcome back" : "Create account"}</h1>
+          <h1>
+            {isLogin ? "Welcome back" : "Create account"}
+          </h1>
 
-        <p>
-          {isLogin
-            ? "Sign in to access your files"
-            : "Create your SecureVault account"}
-        </p>
-      </div>
+          <p>
+            {isLogin
+              ? "Sign in to access your files"
+              : "Create your SecureVault account"}
+          </p>
+        </div>
 
-      <form className="auth-form">
-        {!isLogin && (
+        <form
+          className="auth-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            onSubmit();
+          }}
+        >
+          {!isLogin && (
+            <div className="form-group">
+              <label htmlFor="name">Name</label>
+
+              <input
+                id="name"
+                type="text"
+                placeholder="Your name"
+              />
+            </div>
+          )}
+
           <div className="form-group">
-            <label htmlFor="name">Name</label>
+            <label htmlFor="email">Email</label>
+
             <input
-              id="name"
-              type="text"
-              placeholder="Your name"
+              id="email"
+              type="email"
+              placeholder="you@example.com"
             />
           </div>
-        )}
 
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            placeholder="you@example.com"
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-          />
-        </div>
-
-        {!isLogin && (
           <div className="form-group">
-            <label htmlFor="confirmPassword">
-              Confirm password
-            </label>
+            <label htmlFor="password">Password</label>
 
             <input
-              id="confirmPassword"
+              id="password"
               type="password"
               placeholder="••••••••"
             />
           </div>
-        )}
 
-        <button className="auth-submit" type="submit">
-          {isLogin ? "Login" : "Register"}
-        </button>
-      </form>
+          {!isLogin && (
+            <div className="form-group">
+              <label htmlFor="confirmPassword">
+                Confirm password
+              </label>
 
-      <div className="auth-switch">
-        <span>
-          {isLogin
-            ? "Don't have an account?"
-            : "Already have an account?"}
-        </span>
+              <input
+                id="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+              />
+            </div>
+          )}
 
-        <button type="button" onClick={onSwitch}>
-          {isLogin ? "Register" : "Login"}
-        </button>
+          <button
+            className="auth-submit"
+            type="submit"
+          >
+            {isLogin ? "Login" : "Register"}
+          </button>
+        </form>
+
+        <div className="auth-switch">
+          <span>
+            {isLogin
+              ? "Don't have an account?"
+              : "Already have an account?"}
+          </span>
+
+          <button
+            type="button"
+            onClick={onSwitch}
+          >
+            {isLogin ? "Register" : "Login"}
+          </button>
+        </div>
       </div>
-    </div>
+    </main>
   );
 }
 
