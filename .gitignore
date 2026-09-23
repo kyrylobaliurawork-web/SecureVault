@@ -141,3 +141,32 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+backend/.venv/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Python test/cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
