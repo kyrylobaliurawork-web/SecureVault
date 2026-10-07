@@ -1,3 +1,7 @@
 SecureVault test file
 
 This is a test file for upload, download and delete API testing.
+
+User: test-user
+Project: SecureVault
+Purpose: verify file storage functionality.
