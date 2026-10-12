@@ -1,11 +1,25 @@
 import { useNavigate } from "react-router-dom";
 import AuthForm from "../../../components/AuthForm/AuthForm";
+import { loginUser } from "../../../services/auth";
+import { useAuth } from "../../../context/AuthContext";
 
 function Login() {
   const navigate = useNavigate();
+  const { refreshUser } = useAuth();
 
-  const handleLogin = () => {
-    // Поки просто імітуємо успішний login
+  const handleLogin = async (data: {
+    login?: string;
+    email: string;
+    password: string;
+  }) => {
+    const result = await loginUser({
+      email: data.email,
+      password: data.password,
+    });
+
+    sessionStorage.setItem("access_token", result.access_token);
+
+    await refreshUser();
     navigate("/");
   };
 

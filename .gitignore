@@ -170,3 +170,16 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Pytest
+.pytest_cache/
+
+# Environment variables
+.env
+.env.*
+!.env.example

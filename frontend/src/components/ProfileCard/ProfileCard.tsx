@@ -1,16 +1,28 @@
+
+import { useAuth } from "../../context/AuthContext";
 import "./ProfileCard.css";
 
 function ProfileCard() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <section className="profile-card">Loading profile...</section>;
+  }
+
+  if (!user) {
+    return <section className="profile-card">Please log in to view your profile.</section>;
+  }
+
   return (
     <section className="profile-card">
       <div className="profile-header">
         <div className="profile-avatar">
-          K
+          {user.login.charAt(0).toUpperCase()}
         </div>
 
         <div>
-          <h1>Kyrylo</h1>
-          <p>kyrylo@example.com</p>
+          <h1>{user.login}</h1>
+          <p>{user.email}</p>
         </div>
       </div>
 
@@ -22,21 +34,17 @@ function ProfileCard() {
         <div className="profile-info">
           <div className="info-item">
             <span className="info-label">Name</span>
-            <span className="info-value">Kyrylo</span>
+            <span className="info-value">{user.login}</span>
           </div>
 
           <div className="info-item">
             <span className="info-label">Email</span>
-            <span className="info-value">
-              kyrylo@example.com
-            </span>
+            <span className="info-value">{user.email}</span>
           </div>
 
           <div className="info-item">
-            <span className="info-label">Member since</span>
-            <span className="info-value">
-              September 2026
-            </span>
+            <span className="info-label">User ID</span>
+            <span className="info-value">{user.id}</span>
           </div>
         </div>
       </div>
@@ -45,10 +53,7 @@ function ProfileCard() {
 
       <div className="profile-section">
         <h2>Security</h2>
-
-        <button className="password-button">
-          Change password
-        </button>
+        <p>Password changes are not implemented yet.</p>
       </div>
     </section>
   );

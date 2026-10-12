@@ -103,3 +103,19 @@
 .action-button.delete:hover {
   background-color: #fee2e2;
 }
+
+.file-error {
+  color: #dc2626;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 16px 0;
+  font-size: 14px;
+}
+
+.upload-button:disabled,
+.action-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

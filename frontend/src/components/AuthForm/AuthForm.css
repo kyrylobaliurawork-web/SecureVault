@@ -134,3 +134,13 @@
 .auth-switch button:hover {
   text-decoration: underline;
 }
+
+.auth-error {
+  color: #dc2626;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  margin: 0;
+}
