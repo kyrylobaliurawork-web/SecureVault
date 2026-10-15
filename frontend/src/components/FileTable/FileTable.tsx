@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/useAuth";
 import {listFiles, uploadFile, downloadFile, deleteFile, type StoredFile,} from "../../services/file";
 import "./FileTable.css";
 
@@ -41,12 +41,10 @@ function FileTable() {
       return;
     }
 
-    setLoadingFiles(true);
-    setError("");
-
     try {
       const result = await listFiles(token);
       setFiles(result);
+      setError("");
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to load files",
@@ -56,11 +54,45 @@ function FileTable() {
     }
   }, [user]);
 
-  useEffect(() => {
-    if (!authLoading) {
-      void loadFiles();
+useEffect(() => {
+  if (authLoading || !user) return;
+
+  let cancelled = false;
+
+  async function fetchFiles() {
+    const token = sessionStorage.getItem("access_token");
+
+    if (!token) {
+      setLoadingFiles(false);
+      return;
     }
-  }, [authLoading, loadFiles]);
+
+    try {
+      const result = await listFiles(token);
+
+      if (!cancelled) {
+        setFiles(result);
+        setError("");
+      }
+    } catch (err) {
+      if (!cancelled) {
+        setError(
+          err instanceof Error ? err.message : "Failed to load files",
+        );
+      }
+    } finally {
+      if (!cancelled) {
+        setLoadingFiles(false);
+      }
+    }
+  }
+
+  void fetchFiles();
+
+  return () => {
+    cancelled = true;
+  };
+}, [authLoading, user]);
 
   async function handleUpload(
     event: React.ChangeEvent<HTMLInputElement>,
