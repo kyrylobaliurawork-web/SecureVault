@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: securevault-config
+data:
+  POSTGRES_DB: securevault
+  POSTGRES_USER: securevault

@@ -1,0 +1,8 @@
+namespace: securevault
+resources:
+  - configmap.yaml
+  - postgres.yaml
+  - backend.yaml
+  - frontend.yaml
+  - ingress.yaml
+  - networkpolicy.yaml
