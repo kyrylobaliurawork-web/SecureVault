@@ -1,0 +1,114 @@
+# delete backend-storage PVC when S3 will be used, because it is not needed anymore
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backend-storage
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  # Can be scaled to >1, but then the backend must use S3 for storage, because RWO volume cannot be mounted by multiple pods
+  replicas: 1
+  # Recreate strategy, because backend must be restarted when DB is restarted (it runs alembic upgrade head on startup)
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      initContainers:
+        - name: wait-for-db
+          image: busybox:1.37
+          command:
+            - sh
+            - -c
+            - until nc -z db 5432; do echo "waiting for db"; sleep 2; done
+      containers:
+        - name: backend
+          image: ghcr.io/kyrylobaliurawork-web/securevault-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: securevault-config
+                  key: POSTGRES_USER
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: securevault-config
+                  key: POSTGRES_DB
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: securevault-secret
+                  key: POSTGRES_PASSWORD
+            # Password must be with alphanumeric characters, because it is used in DATABASE_URL
+            - name: DATABASE_URL
+              value: postgresql+psycopg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@db:5432/$(POSTGRES_DB)
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: securevault-secret
+                  key: SECRET_KEY
+          volumeMounts:
+            - name: storage
+              mountPath: /app/storage
+
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 20
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            requests:
+              cpu: 100m
+              memory: 192Mi
+            limits:
+              memory: 384Mi
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: backend-storage
+---
+# Service for backend. Name "backend" is DNS name inside the cluster (backend:8000), like in docker-compose.
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 8000
+      targetPort: 8000
