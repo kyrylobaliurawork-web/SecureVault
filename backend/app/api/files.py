@@ -1,6 +1,8 @@
 from fastapi import (APIRouter, Depends, File as FastAPIFile, HTTPException, UploadFile)
 
-from fastapi.responses import FileResponse as FastAPIFileResponse
+from urllib.parse import quote
+
+from fastapi.responses import StreamingResponse
 
 from sqlalchemy.orm import Session
 
@@ -9,6 +11,17 @@ from app.db.database import get_db
 from app.db.models import File, User
 from app.schemas.file import FileResponse
 from app.services.file_service import (calculate_checksum, generate_storage_key, sanitize_filename, storage, validate_file)
+
+CHUNK_SIZE = 1024 * 1024
+
+
+def iter_stream(stream):
+    try:
+        while chunk := stream.read(CHUNK_SIZE):
+            yield chunk
+    finally:
+        stream.close()
+
 
 router = APIRouter(
     prefix="/files",
@@ -111,7 +124,7 @@ def download_file(
         )
 
     try:
-        file_path = storage.get(
+        stream = storage.open(
             db_file.storage_key
         )
 
@@ -121,10 +134,16 @@ def download_file(
             detail="Stored file not found",
         )
 
-    return FastAPIFileResponse(
-        path=file_path,
-        filename=db_file.filename,
+    return StreamingResponse(
+        iter_stream(stream),
         media_type=db_file.content_type,
+        headers={
+            "Content-Disposition": (
+                "attachment; filename*=UTF-8''"
+                + quote(db_file.filename)
+            ),
+            "Content-Length": str(db_file.size),
+        },
     )
 
 

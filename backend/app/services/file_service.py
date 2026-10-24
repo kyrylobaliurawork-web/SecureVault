@@ -5,6 +5,7 @@ import uuid
 from fastapi import HTTPException, UploadFile
 import magic
 
+from app.services.storage.base import StorageService
 from app.services.storage.local import LocalStorage
 
 
@@ -20,7 +21,33 @@ ALLOWED_CONTENT_TYPES = {
 
 mime_detector = magic.Magic(mime=True)
 
-storage = LocalStorage()
+def build_storage() -> StorageService:
+    backend = os.getenv("STORAGE_BACKEND", "local").lower()
+
+    if backend == "local":
+        return LocalStorage(
+            os.getenv("LOCAL_STORAGE_PATH", "storage")
+        )
+
+    if backend == "s3":
+        bucket = os.getenv("S3_BUCKET")
+
+        if not bucket:
+            raise RuntimeError("S3_BUCKET is not configured")
+
+        from app.services.storage.s3 import S3Storage
+
+        return S3Storage(
+            bucket=bucket,
+            region=os.getenv("AWS_REGION"),
+        )
+
+    raise RuntimeError(
+        f"Unknown STORAGE_BACKEND: {backend!r} (use 'local' or 's3')"
+    )
+
+
+storage = build_storage()
 
 
 def generate_storage_key() -> str:
