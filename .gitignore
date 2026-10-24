@@ -189,3 +189,6 @@ frontend/.env.local
 frontend/.env.*.local
 
 k8s/Secrets.yaml
+
+*.pem
+*.key
