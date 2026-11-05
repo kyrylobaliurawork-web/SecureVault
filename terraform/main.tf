@@ -83,6 +83,25 @@ resource "aws_iam_role_policy_attachment" "ssm_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+resource "aws_secretsmanager_secret" "ghcr" {
+  name        = "securevault/ghcr"
+  description = "Private GHCR credentials"
+}
+
+resource "aws_iam_role_policy" "ghcr_access" {
+  name = "securevault-ghcr-access"
+  role = aws_iam_role.ec2_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["secretsmanager:GetSecretValue"]
+      Resource = aws_secretsmanager_secret.ghcr.arn
+    }]
+  })
+}
+
 resource "aws_iam_instance_profile" "ec2_profile" {
   name = "${var.project_name}-instance-profile"
   role = aws_iam_role.ec2_role.name
@@ -115,4 +134,9 @@ resource "aws_instance" "securevault" {
   tags = {
     Name = "${var.project_name}-ec2"
   }
+
+  depends_on = [
+    aws_iam_role_policy.ghcr_access,
+    aws_iam_role_policy_attachment.ssm_policy
+  ]
 }
