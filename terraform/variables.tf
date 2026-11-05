@@ -32,3 +32,21 @@ variable "root_volume_size" {
     error_message = "Root volume must be at least 8 GB."
   }
 }
+
+variable "db_instance_class" {
+  type        = string
+  default     = "db.t3.micro"
+  description = "RDS instance class"
+}
+
+variable "db_name" {
+  type        = string
+  default     = "securevault"
+  description = "PostgreSQL database name"
+}
+
+variable "db_username" {
+  type        = string
+  default     = "securevault_admin"
+  description = "RDS master username"
+}
