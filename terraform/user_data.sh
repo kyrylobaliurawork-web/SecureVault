@@ -9,7 +9,16 @@ S3_BUCKET="${s3_bucket}"
 echo "Starting SecureVault bootstrap..."
 
 apt-get update -y
-apt-get install -y docker.io docker-compose-v2 awscli jq
+apt-get install -y docker.io docker-compose-v2 jq curl unzip
+
+curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" \
+    -o "/tmp/awscliv2.zip"
+
+unzip -q /tmp/awscliv2.zip -d /tmp
+
+/tmp/aws/install
+
+rm -rf /tmp/aws /tmp/awscliv2.zip
 
 systemctl enable --now docker
 

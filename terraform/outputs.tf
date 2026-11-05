@@ -38,7 +38,7 @@ output "rds_security_group_id" {
 }
 
 output "iam_role_name" {
-  value = aws_iam_role.ec2.name
+  value = aws_iam_role.ec2_role.name
 }
 
 output "s3_bucket_name" {
