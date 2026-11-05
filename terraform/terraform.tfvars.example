@@ -1,5 +1,10 @@
-project_name     = "securevault"
-environment      = "dev"
-aws_region       = "us-east-1"
-instance_type    = "t3.small"
-root_volume_size = 20
+project_name      = "securevault"
+environment       = "dev"
+aws_region        = "us-east-1"
+
+instance_type     = "t3.small"
+root_volume_size  = 20
+
+db_instance_class = "db.t3.micro"
+db_name           = "securevault"
+db_username       = "db_admin_example"
