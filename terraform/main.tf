@@ -88,17 +88,47 @@ resource "aws_secretsmanager_secret" "ghcr" {
   description = "Private GHCR credentials"
 }
 
+data "aws_caller_identity" "current" {}
+
 resource "aws_iam_role_policy" "ghcr_access" {
-  name = "securevault-ghcr-access"
+  name = "securevault-ec2-access"
   role = aws_iam_role.ec2_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Effect   = "Allow"
-      Action   = ["secretsmanager:GetSecretValue"]
-      Resource = aws_secretsmanager_secret.ghcr.arn
-    }]
+
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ]
+        Resource = [
+          aws_secretsmanager_secret.ghcr.arn,
+          "arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:securevault/app-*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::securevault-files-806116531925-us-east-1-an"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = [
+          "arn:aws:s3:::securevault-files-806116531925-us-east-1-an/*"
+        ]
+      }
+    ]
   })
 }
 
