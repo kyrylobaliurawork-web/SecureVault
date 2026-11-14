@@ -39,20 +39,24 @@ cd /opt/securevault
 
 echo "Retrieving GHCR credentials..."
 
-GHCR_JSON=$(aws secretsmanager get-secret-value \
-    --secret-id "$GHCR_SECRET" \
-    --region "$REGION" \
-    --query SecretString \
-    --output text)
+# =========================================================================================================================================================================================================================
+# Everything below is commented out because the GHCR credentials are not needed for public images. If you are using private images, uncomment the following lines and ensure the GHCR_SECRET exists in AWS Secrets Manager.
+# =========================================================================================================================================================================================================================
 
-GHCR_USERNAME=$(echo "$GHCR_JSON" | jq -er '.username')
-GHCR_TOKEN=$(echo "$GHCR_JSON" | jq -er '.token')
+# GHCR_JSON=$(aws secretsmanager get-secret-value \
+#     --secret-id "$GHCR_SECRET" \
+#     --region "$REGION" \
+#     --query SecretString \
+#     --output text)
 
-echo "$GHCR_TOKEN" | docker login ghcr.io \
-    --username "$GHCR_USERNAME" \
-    --password-stdin
+# GHCR_USERNAME=$(echo "$GHCR_JSON" | jq -er '.username')
+# GHCR_TOKEN=$(echo "$GHCR_JSON" | jq -er '.token')
 
-unset GHCR_JSON GHCR_TOKEN
+# echo "$GHCR_TOKEN" | docker login ghcr.io \
+#     --username "$GHCR_USERNAME" \
+#     --password-stdin
+
+# unset GHCR_JSON GHCR_TOKEN
 
 echo "Retrieving application secrets..."
 
